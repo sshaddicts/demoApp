@@ -7,3 +7,5 @@ gradle.properties
 build
 captures
 .externalNativeBuild
+*.log
+

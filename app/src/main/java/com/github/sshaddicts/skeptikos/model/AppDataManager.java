@@ -1,13 +1,15 @@
 package com.github.sshaddicts.skeptikos.model;
 
+import com.github.sshaddicts.neuralclient.Client;
+
 public class AppDataManager implements DataManager {
 
-    public DbHelper helper;
+    public Client neuralSwarmClient;
 
     public static class AppDataManagerBuilder{
         public static final AppDataManager INSTANCE = new AppDataManager();
-        public static void setDbHelper(DbHelper helper){
-            INSTANCE.setDbHelper(helper);
+        public static void setNeuralSwarmClient(Client neuralSwarmClient){
+            INSTANCE.setDbHelper(neuralSwarmClient);
         }
 
         public static AppDataManager build(){
@@ -19,7 +21,7 @@ public class AppDataManager implements DataManager {
         return AppDataManagerBuilder.INSTANCE;
     }
 
-    private void setDbHelper(DbHelper helper){
-
+    private void setDbHelper(Client client){
+        this.neuralSwarmClient = client;
     }
 }
