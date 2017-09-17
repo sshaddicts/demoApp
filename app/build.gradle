@@ -42,7 +42,6 @@ dependencies {
     compile group: 'org.slf4j', name: 'slf4j-android', version: '1.7.25'
     compile project(':app:libs:openCVLibrary320')
 
-    compile 'com.github.sshaddicts.lucrecium:lucrecium-core:0.0.4'
     compile 'com.github.sshaddicts:neuralswarm.client:0.0.9'
     compile 'org.jdeferred:jdeferred-android-aar:1.2.6'
 

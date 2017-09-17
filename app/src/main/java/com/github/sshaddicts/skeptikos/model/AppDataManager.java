@@ -6,22 +6,23 @@ public class AppDataManager implements DataManager {
 
     public Client neuralSwarmClient;
 
-    public static class AppDataManagerBuilder{
+    public static class AppDataManagerBuilder {
         public static final AppDataManager INSTANCE = new AppDataManager();
-        public static void setNeuralSwarmClient(Client neuralSwarmClient){
+
+        public static void setNeuralSwarmClient(Client neuralSwarmClient) {
             INSTANCE.setDbHelper(neuralSwarmClient);
         }
 
-        public static AppDataManager build(){
+        public static AppDataManager build() {
             return INSTANCE;
         }
     }
 
-    public static AppDataManager getInstance(){
+    public static AppDataManager getInstance() {
         return AppDataManagerBuilder.INSTANCE;
     }
 
-    private void setDbHelper(Client client){
+    private void setDbHelper(Client client) {
         this.neuralSwarmClient = client;
     }
 }
