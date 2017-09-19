@@ -1,4 +1,4 @@
-package com.github.sshaddicts.skeptikos.view;
+package com.github.sshaddicts.skeptikos.fragments;
 
 import com.github.sshaddicts.neuralclient.data.ProcessedData;
 

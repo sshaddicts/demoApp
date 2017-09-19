@@ -7,7 +7,7 @@ import com.github.sshaddicts.neuralclient.Client;
 import com.github.sshaddicts.neuralclient.ConnectedClient;
 import com.github.sshaddicts.neuralclient.data.ProcessedData;
 import com.github.sshaddicts.neuralclient.encoding.Base64Coder;
-import com.github.sshaddicts.skeptikos.view.CustomView;
+import com.github.sshaddicts.skeptikos.fragments.CustomView;
 
 import org.jdeferred.Deferred;
 import org.jdeferred.DoneCallback;
@@ -29,11 +29,36 @@ public class NeuralSwarmClient {
 
     private Deferred<AuthenticatedClient, Void, Void> deferredClient = new DeferredObject<>();
 
+    public void setUsername(String username){
+        this.username = username;
+    }
+    public void setPassword(String password){
+        this.password = password;
+    }
+
     public NeuralSwarmClient(String username, String password, CustomView view) {
         this.username = username;
         this.password = password;
         this.view = view;
-        client = new Client("ws://neuralswarm.sshaddicts.ml/", "api", new Base64Coder() {
+        client = new Client("ws://192.168.0.111:7778/", "api", new Base64Coder() {
+            @NotNull
+            @Override
+            public String encode(@NotNull byte[] bytes) {
+                byte[] encode = Base64.encode(bytes, Base64.DEFAULT);
+                return new String(encode);
+            }
+
+            @NotNull
+            @Override
+            public byte[] decode(@NotNull String s) {
+                return Base64.decode(s, Base64.DEFAULT);
+            }
+        });
+    }
+
+    public NeuralSwarmClient(CustomView view){
+        this.view = view;
+        this.client = new Client("ws://192.168.0.111:7778/", "api", new Base64Coder() {
             @NotNull
             @Override
             public String encode(@NotNull byte[] bytes) {
@@ -107,6 +132,7 @@ public class NeuralSwarmClient {
                             @Override
                             public void call(ProcessedData processedData) {
                                 view.receiveData(processedData);
+                                System.out.println("imageProcessingFinished");
                             }
                         },
                         new Action1<Throwable>() {
@@ -118,7 +144,6 @@ public class NeuralSwarmClient {
                 );
             }
         });
-        System.out.println("imageProcessingFinished");
     }
 
     public void connect() throws NoSuchFieldException, IllegalAccessException {

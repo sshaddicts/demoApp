@@ -37,13 +37,15 @@ dependencies {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
 
-    compile 'com.android.support:appcompat-v7:21.0.3'
-    compile 'com.android.support.constraint:constraint-layout:1.0.2'
     compile group: 'org.slf4j', name: 'slf4j-android', version: '1.7.25'
     compile project(':app:libs:openCVLibrary320')
 
+    compile group: 'commons-io', name: 'commons-io', version: '2.5'
+
+    compile 'com.android.support:appcompat-v7:21.0.3'
+    compile 'com.android.support.constraint:constraint-layout:1.0.2'
     compile 'com.github.sshaddicts:neuralswarm.client:0.0.9'
     compile 'org.jdeferred:jdeferred-android-aar:1.2.6'
-
+    compile 'com.android.support:support-v4:21.0.3'
     testCompile 'junit:junit:4.12'
 }
