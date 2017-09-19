@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,8 +20,11 @@ public class LogInFragment extends Fragment {
 
     private TextView info;
     private TextView account;
+    private boolean isRegistrationRequested = false;
+    Button button;
 
-    public LogInFragment() {}
+    public LogInFragment() {
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -30,36 +34,52 @@ public class LogInFragment extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
 
-        info = (TextView)view.findViewById(R.id.loginInfoText);
-        account = (TextView)view.findViewById(R.id.loginRegister);
-        Button button = (Button)view.findViewById(R.id.loginConnectButton);
+        info = (TextView) view.findViewById(R.id.loginInfoText);
+        account = (TextView) view.findViewById(R.id.loginRegister);
+        button = (Button) view.findViewById(R.id.loginConnectButton);
 
-        final EditText usernameField = (EditText)view.findViewById(R.id.loginUsernameEdit);
-        final EditText passwordField = (EditText)view.findViewById(R.id.loginPasswordEdit);
+        final EditText usernameField = (EditText) view.findViewById(R.id.loginUsernameEdit);
+        final EditText passwordField = (EditText) view.findViewById(R.id.loginPasswordEdit);
 
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String username = usernameField.getText().toString();
                 String password = passwordField.getText().toString();
-                onCredentialsEntered(username, password);
+                onCredentialsEntered(username, password, isRegistrationRequested);
             }
         });
 
         account.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(mListener != null){
-                    mListener.onRegisterNewAccount();
+                if(isRegistrationRequested){
+                    account.setText(R.string.label_no_account_message);
+                    info.setText(R.string.welcoming_message);
+                    button.setText(R.string.connect_button_text);
+                }else{
+                    account.setText(R.string.label_misstap_message);
+                    info.setText(R.string.register_message);
+                    button.setText(R.string.register_button_text);
                 }
+
+                isRegistrationRequested = !isRegistrationRequested;
             }
         });
 
-        try {
-            AppDataManager.getClient().connect();
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            e.printStackTrace();
-        }
+        view.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                switch (keyCode){
+                    case KeyEvent.KEYCODE_BACK:{
+                        info.setText(R.string.welcoming_message);
+                        button.setText(R.string.connect_button_text);
+                        return true;
+                    }
+                    default: return false;
+                }
+            }
+        });
     }
 
     @Override
@@ -68,19 +88,23 @@ public class LogInFragment extends Fragment {
         return inflater.inflate(R.layout.fragment_log_in, container, false);
     }
 
-    public void onCredentialsEntered(String username, String password) {
-        try{
+    public void onCredentialsEntered(String username, String password, boolean register) {
+        try {
             AppDataManager.getClient().setUsername(username);
             AppDataManager.getClient().setPassword(password);
-            AppDataManager.getClient().authenticateClient();
+
+            if (register) {
+                AppDataManager.getClient().registerClient();
+            } else {
+                AppDataManager.getClient().authenticateClient();
+            }
 
             if (mListener != null) {
-                mListener.onAuthenticated(username);
+                mListener.onAuthenticated();
             }
-        }catch (Throwable e){
-            info.setText("Sorry, incorrect credentials.");
+        } catch (Throwable e) {
+            info.setText(R.string.incorrect_credentials_message);
         }
-
     }
 
     @Override
@@ -101,7 +125,6 @@ public class LogInFragment extends Fragment {
     }
 
     public interface LoginInteractionListener {
-        void onAuthenticated(String username);
-        void onRegisterNewAccount();
+        void onAuthenticated();
     }
 }

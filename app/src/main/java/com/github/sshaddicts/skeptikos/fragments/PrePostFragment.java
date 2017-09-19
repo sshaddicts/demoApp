@@ -1,29 +1,36 @@
 package com.github.sshaddicts.skeptikos.fragments;
 
 import android.app.Activity;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 
 import com.github.sshaddicts.skeptikos.R;
 
+import java.nio.ByteBuffer;
+
 
 public class PrePostFragment extends Fragment {
-    private static final String ARG_PARAM1 = "param1";
 
     private PrePostFragmentListener mListener;
 
-    private byte[] image;
+    private byte[] imageData;
+    private int width;
+    private int height;
 
     public PrePostFragment() {}
 
-    public static PrePostFragment newInstance(byte[] data) {
+    public static PrePostFragment newInstance(byte[] data, int width, int height) {
         PrePostFragment fragment = new PrePostFragment();
         Bundle args = new Bundle();
-        args.putByteArray(ARG_PARAM1, data);
+        args.putByteArray("p1", data);
+        args.putInt("p2", width);
+        args.putInt("p3", height);
         fragment.setArguments(args);
         return fragment;
     }
@@ -32,7 +39,9 @@ public class PrePostFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            image = getArguments().getByteArray(ARG_PARAM1);
+            imageData = getArguments().getByteArray("p1");
+            width = getArguments().getInt("p2");
+            height = getArguments().getInt("p3");
         }
     }
 
@@ -47,6 +56,13 @@ public class PrePostFragment extends Fragment {
 
         Button done = (Button) view.findViewById(R.id.prePostDone);
 
+        ImageView imageView = (ImageView) view.findViewById(R.id.prePostImage);
+        Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+
+        bitmap.copyPixelsFromBuffer(ByteBuffer.wrap(imageData));
+
+        imageView.setImageBitmap(bitmap);
+
         done.setOnClickListener(new View.OnClickListener() {
             //this has to retrieve byte data and send it back
             @Override
@@ -58,7 +74,7 @@ public class PrePostFragment extends Fragment {
 
     public void onDone() {
         if (mListener != null) {
-            mListener.onDone();
+            mListener.onPrePostConfirm();
         }
     }
 
@@ -80,7 +96,7 @@ public class PrePostFragment extends Fragment {
     }
 
     public interface PrePostFragmentListener {
-        void onDone();
-        void onCancel();
+        void onPrePostConfirm();
+        void onPrePostCancel();
     }
 }

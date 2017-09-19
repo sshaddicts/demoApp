@@ -1,7 +1,7 @@
 package com.github.sshaddicts.skeptikos;
 
+import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -14,7 +14,7 @@ import android.widget.Toast;
 import com.github.sshaddicts.neuralclient.data.ProcessedData;
 import com.github.sshaddicts.skeptikos.fragments.CustomView;
 import com.github.sshaddicts.skeptikos.fragments.InfoDisplayFragment;
-import com.github.sshaddicts.skeptikos.fragments.LogInFragment;
+import com.github.sshaddicts.skeptikos.fragments.InfoDisplayFragment.InfoDisplayFragmentListener;
 import com.github.sshaddicts.skeptikos.fragments.LogInFragment.LoginInteractionListener;
 import com.github.sshaddicts.skeptikos.fragments.PrePostFragment;
 import com.github.sshaddicts.skeptikos.fragments.PrePostFragment.PrePostFragmentListener;
@@ -22,59 +22,49 @@ import com.github.sshaddicts.skeptikos.fragments.SelectPictureFragment;
 import com.github.sshaddicts.skeptikos.fragments.SelectPictureFragment.PictureSelectedListener;
 import com.github.sshaddicts.skeptikos.model.AppDataManagerHolder.AppDataManager;
 import com.github.sshaddicts.skeptikos.model.NeuralSwarmClient;
-import com.github.sshaddicts.skeptikos.fragments.InfoDisplayFragment;
-import com.github.sshaddicts.skeptikos.fragments.InfoDisplayFragment.InfoDisplayFragmentListener;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 
 public class MainActivity extends ActionBarActivity implements CustomView, LoginInteractionListener,
         PictureSelectedListener, PrePostFragmentListener, InfoDisplayFragmentListener {
-
-    private static final int REQUEST_IMAGE_CAPTURE = 1;
-    private static final int PAGE_NUMBER = 2;
-
     private static final String TAG = MainActivity.class.toString();
 
-    private String username;
-
-    //private ViewPager pager;
     private FragmentManager fm;
+    private Bitmap imageToSend;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        setTheme(R.style.AppThemeDark);
         super.onCreate(savedInstanceState);
 
-        NeuralSwarmClient neuralClient = new NeuralSwarmClient("test", "test", this);
+        NeuralSwarmClient neuralClient = new NeuralSwarmClient(this);
+        try {
+            neuralClient.connect();
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            e.printStackTrace();
+        }
         AppDataManager.setNeuralSwarmClient(neuralClient);
 
         setContentView(R.layout.activity_main);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         fm = getSupportFragmentManager();
-
-        Log.d(TAG, "Setting pager to display login fragment...");
     }
 
     @Override
     public void receiveData(ProcessedData data) {
+        //cancel splash screen
         Toast.makeText(getApplicationContext(), "Data received!", Toast.LENGTH_SHORT).show();
     }
 
-    public void showLoginScreen() {
-        LogInFragment login = new LogInFragment();
-        FragmentTransaction transaction = fm.beginTransaction();
-        transaction.add(R.id.fragmentContainer, login);
-        transaction.commit();
-    }
-
     @Override
-    public void onAuthenticated(String username) {
-        this.username = username;
+    public void onAuthenticated() {
 
         ViewGroup container = (ViewGroup) findViewById(R.id.fragmentContainer);
         container.removeAllViews();
 
-        SelectPictureFragment fragment = SelectPictureFragment.newInstance(this.username);
+        SelectPictureFragment fragment = new SelectPictureFragment();
         FragmentTransaction transaction = fm.beginTransaction();
         transaction.replace(R.id.fragmentContainer, fragment);
         transaction.addToBackStack(fragment.getClass().getName());
@@ -82,19 +72,15 @@ public class MainActivity extends ActionBarActivity implements CustomView, Login
     }
 
     @Override
-    public void onRegisterNewAccount() {
-        //switch to registration fragment
-        Toast.makeText(getApplicationContext(), "WE DID IT TO THE REGISTER", Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void onPictureSelection() {
-        Toast.makeText(getApplicationContext(), "hello", Toast.LENGTH_SHORT).show();
+    public void onPictureSelected(Bitmap bmp) {
+        imageToSend = bmp;
+        ByteBuffer bytes = ByteBuffer.allocate(bmp.getHeight() * bmp.getWidth() * 4);
+        bmp.copyPixelsToBuffer(bytes);
 
         ViewGroup container = (ViewGroup) findViewById(R.id.fragmentContainer);
         container.removeAllViews();
 
-        PrePostFragment fragment = PrePostFragment.newInstance(new byte[5]);
+        PrePostFragment fragment = PrePostFragment.newInstance(bytes.array(), bmp.getWidth(), bmp.getHeight());
         FragmentTransaction transaction = fm.beginTransaction();
         transaction.replace(R.id.fragmentContainer, fragment);
         transaction.addToBackStack(fragment.getClass().getName());
@@ -102,10 +88,12 @@ public class MainActivity extends ActionBarActivity implements CustomView, Login
     }
 
     @Override
-    public void onDone() {
+    public void onPrePostConfirm() {
+
         //send request...
-        //AppDataManager.getClient().requestImageProcessing(data);
+        sendRequestForBitmap(imageToSend);
 
+        //display smth
 
         ViewGroup container = (ViewGroup) findViewById(R.id.fragmentContainer);
         container.removeAllViews();
@@ -118,11 +106,12 @@ public class MainActivity extends ActionBarActivity implements CustomView, Login
     }
 
     @Override
-    public void onCancel() {
-
+    public void onPrePostCancel() {
+        //go back, pop stack
+        fm.popBackStack();
     }
 
-    private static void sendRequestForByteArray(byte[] data, int width, int height) {
+    private void sendRequestForByteArray(byte[] data, int width, int height) {
         Log.d(TAG, "Data size: " + data.length);
         AppDataManager.getClient().requestImageProcessing(data, width, height);
     }

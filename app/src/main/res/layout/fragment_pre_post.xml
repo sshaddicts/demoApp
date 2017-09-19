@@ -11,7 +11,7 @@
         android:id="@+id/prePostImage"
         android:layout_width="332dp"
         android:layout_height="479dp"
-        android:src="@mipmap/logo_dark"
+        android:src="@drawable/logo_dark"
         android:layout_marginLeft="8dp"
         app:layout_constraintLeft_toLeftOf="parent"
         android:layout_marginRight="8dp"

@@ -11,7 +11,7 @@
         android:id="@+id/selectImageCapture"
         android:layout_width="214dp"
         android:layout_height="56dp"
-        android:text="I want to take an image"
+        android:text="@string/take_image_button"
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginLeft="8dp"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -38,7 +38,7 @@
         app:layout_constraintTop_toTopOf="@+id/selectImageCapture" />
 
     <GridLayout
-        android:id="@+id/selectImageGrid"
+        android:id="@+id/selectImageHistoryGrid"
         android:layout_width="338dp"
         android:layout_height="489dp"
         android:layout_marginBottom="8dp"

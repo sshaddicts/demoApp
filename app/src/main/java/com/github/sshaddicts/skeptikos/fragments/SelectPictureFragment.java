@@ -1,40 +1,41 @@
 package com.github.sshaddicts.skeptikos.fragments;
 
 import android.app.Activity;
-import android.net.Uri;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.Toast;
 
 import com.github.sshaddicts.skeptikos.R;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+
 public class SelectPictureFragment extends Fragment {
 
-    private static final String USERNAME_ARG = "username";
-    private String username;
+    private static final int IMAGE_SELECTION = 1;
+
+    private static final String TAG = SelectPictureFragment.class.toString();
 
     private PictureSelectedListener mListener;
 
     public SelectPictureFragment() {}
 
-    public static SelectPictureFragment newInstance(String username) {
-        SelectPictureFragment fragment = new SelectPictureFragment();
-        Bundle args = new Bundle();
-        args.putString(USERNAME_ARG, username);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            this.username = getArguments().getString(USERNAME_ARG);
-        }
     }
 
     @Override
@@ -45,18 +46,58 @@ public class SelectPictureFragment extends Fragment {
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        Button button = (Button) view.findViewById(R.id.selectImageCapture);
-        button.setOnClickListener(new View.OnClickListener() {
+        Button takePicButton = (Button) view.findViewById(R.id.selectImageCapture);
+        ImageButton selectImageFromGalleryButton = (ImageButton) view.findViewById(R.id.selectImageDone);
+        takePicButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                onButtonPressed();
+                dispatchTakePicture();
             }
         });
+        selectImageFromGalleryButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dispatchSelectPicture();
+            }
+        });
+
+
+        //GridView grid = (GridView) view.findViewById(R.id.selectImageGrid);
+        //GridViewAdapter gridAdapter = new GridViewAdapter(this.getActivity().getApplicationContext(), R.id.gridRowImageView, getData());
+        //grid.setAdapter(gridAdapter);
     }
 
-    public void onButtonPressed() {
-        if (mListener != null) {
-            mListener.onPictureSelection();
+    public void dispatchTakePicture() {
+        //dispatch camera intent
+    }
+
+    public void dispatchSelectPicture() {
+        //dispatch selection intent
+        Intent intent = new Intent();
+        intent.setType("image/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(Intent.createChooser(intent, "Select Picture"), IMAGE_SELECTION);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(requestCode == 1 && resultCode == Activity.RESULT_OK){
+            //send the bmp back
+            try {
+                InputStream stream = getActivity().getContentResolver().openInputStream(data.getData());
+                if(stream != null){
+                    Log.d(TAG, "Sending image to PrePost... Image size is " + stream.available());
+
+                    Bitmap bitmap = BitmapFactory.decodeStream(stream);
+
+                    if(mListener != null){
+                        mListener.onPictureSelected(bitmap);
+                    }
+                }
+            } catch (IOException | NullPointerException e) {
+                Toast.makeText(getActivity().getApplicationContext(), "Something went bad, sorry", Toast.LENGTH_SHORT).show();
+                e.printStackTrace();
+            }
         }
     }
 
@@ -78,7 +119,6 @@ public class SelectPictureFragment extends Fragment {
     }
 
     public interface PictureSelectedListener {
-        // TODO: Update argument type and name
-        void onPictureSelection();
+        void onPictureSelected(Bitmap picture);
     }
 }
