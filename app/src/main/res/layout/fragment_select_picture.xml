@@ -5,42 +5,39 @@
     android:layout_height="match_parent"
     tools:context="com.github.sshaddicts.skeptikos.fragments.SelectPictureFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-
     <Button
         android:id="@+id/selectImageCapture"
-        android:layout_width="214dp"
-        android:layout_height="56dp"
+        android:layout_width="135dp"
+        android:layout_height="74dp"
         android:text="@string/take_image_button"
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginLeft="8dp"
         app:layout_constraintLeft_toLeftOf="parent"
         android:layout_marginRight="8dp"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintHorizontal_bias="0.061"
+        app:layout_constraintHorizontal_bias="0.035"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
-        android:layout_marginTop="9dp" />
+        android:layout_marginTop="6dp" />
 
-    <ImageButton
+    <Button
         android:id="@+id/selectImageDone"
-        android:layout_width="56dp"
-        android:layout_height="56dp"
+        android:layout_width="135dp"
+        android:layout_height="74dp"
         android:layout_marginEnd="8dp"
         android:layout_marginLeft="31dp"
         android:layout_marginRight="8dp"
         android:layout_marginStart="31dp"
-        android:layout_marginTop="0dp"
-        android:src="@drawable/abc_btn_check_to_on_mtrl_015"
-        app:layout_constraintHorizontal_bias="0.771"
+        android:text="@string/gallery_selection_button"
+        app:layout_constraintHorizontal_bias="0.833"
         app:layout_constraintLeft_toRightOf="@+id/selectImageCapture"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="@+id/selectImageCapture" />
 
     <GridLayout
         android:id="@+id/selectImageHistoryGrid"
-        android:layout_width="338dp"
-        android:layout_height="489dp"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:layout_marginBottom="8dp"
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
@@ -48,9 +45,25 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/selectImageCapture"
-        app:layout_constraintVertical_bias="1.0">
+        app:layout_constraintTop_toBottomOf="@+id/textView2"
+        app:layout_constraintVertical_bias="0.0"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp">
 
     </GridLayout>
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="327dp"
+        android:layout_height="30dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="17dp"
+        android:text="Your previous requests:"
+        android:textSize="24sp"
+        app:layout_constraintHorizontal_bias="0.521"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/selectImageCapture" />
 
 </android.support.constraint.ConstraintLayout>

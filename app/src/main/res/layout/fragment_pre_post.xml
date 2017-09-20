@@ -5,8 +5,6 @@
     android:layout_height="match_parent"
     tools:context="com.github.sshaddicts.skeptikos.fragments.PrePostFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-
     <ImageView
         android:id="@+id/prePostImage"
         android:layout_width="332dp"
@@ -47,7 +45,7 @@
         android:layout_marginTop="7dp"
         android:text="Done"
         app:layout_constraintTop_toBottomOf="@+id/prePostImage"
-        android:layout_marginLeft="42dp"
+        android:layout_marginLeft="44dp"
         app:layout_constraintLeft_toLeftOf="parent" />
 
 </android.support.constraint.ConstraintLayout>

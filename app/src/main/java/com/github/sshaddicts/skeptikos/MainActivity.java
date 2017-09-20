@@ -3,6 +3,7 @@ package com.github.sshaddicts.skeptikos;
 import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.util.Pair;
@@ -11,6 +12,7 @@ import android.util.Log;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.github.sshaddicts.neuralclient.Client;
 import com.github.sshaddicts.neuralclient.data.ProcessedData;
 import com.github.sshaddicts.skeptikos.fragments.CustomView;
 import com.github.sshaddicts.skeptikos.fragments.InfoDisplayFragment;
@@ -23,6 +25,7 @@ import com.github.sshaddicts.skeptikos.fragments.SelectPictureFragment.PictureSe
 import com.github.sshaddicts.skeptikos.model.AppDataManagerHolder.AppDataManager;
 import com.github.sshaddicts.skeptikos.model.NeuralSwarmClient;
 
+import java.io.File;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 
@@ -35,8 +38,18 @@ public class MainActivity extends ActionBarActivity implements CustomView, Login
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        setTheme(R.style.AppThemeDark);
-        super.onCreate(savedInstanceState);
+        StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
+                .detectDiskReads()
+                .detectDiskWrites()
+                .detectNetwork()   // or .detectAll() for all detectable problems
+                .penaltyLog()
+                .build());
+        StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
+                .detectLeakedSqlLiteObjects()
+                .detectLeakedClosableObjects()
+                .penaltyLog()
+                .penaltyDeath()
+                .build());
 
         NeuralSwarmClient neuralClient = new NeuralSwarmClient(this);
         try {
@@ -45,6 +58,9 @@ public class MainActivity extends ActionBarActivity implements CustomView, Login
             e.printStackTrace();
         }
         AppDataManager.setNeuralSwarmClient(neuralClient);
+
+        setTheme(R.style.AppThemeDark);
+        super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
@@ -72,7 +88,7 @@ public class MainActivity extends ActionBarActivity implements CustomView, Login
     }
 
     @Override
-    public void onPictureSelected(Bitmap bmp) {
+    public void onPictureSelected(Bitmap bmp, String fileName) {
         imageToSend = bmp;
         ByteBuffer bytes = ByteBuffer.allocate(bmp.getHeight() * bmp.getWidth() * 4);
         bmp.copyPixelsToBuffer(bytes);
@@ -85,6 +101,10 @@ public class MainActivity extends ActionBarActivity implements CustomView, Login
         transaction.replace(R.id.fragmentContainer, fragment);
         transaction.addToBackStack(fragment.getClass().getName());
         transaction.commit();
+
+        if(fileName != null){
+            new File(fileName).deleteOnExit();
+        }
     }
 
     @Override
@@ -130,5 +150,11 @@ public class MainActivity extends ActionBarActivity implements CustomView, Login
     @Override
     public void onSave() {
         Toast.makeText(getApplicationContext(), "FULL PIPELINE DONE", Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    protected void onDestroy() {
+        Log.d(TAG, "activity destroyed");
+        super.onDestroy();
     }
 }

@@ -12,7 +12,6 @@ import com.github.sshaddicts.skeptikos.fragments.CustomView;
 import org.jdeferred.Deferred;
 import org.jdeferred.DoneCallback;
 import org.jdeferred.impl.DeferredObject;
-import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Field;
 
@@ -29,50 +28,34 @@ public class NeuralSwarmClient {
 
     private Deferred<AuthenticatedClient, Void, Void> deferredClient = new DeferredObject<>();
 
-    public void setUsername(String username){
+    public void setUsername(String username) {
         this.username = username;
     }
-    public void setPassword(String password){
+
+    public void setPassword(String password) {
         this.password = password;
     }
 
-    public NeuralSwarmClient(String username, String password, CustomView view) {
-        this.username = username;
-        this.password = password;
+    public NeuralSwarmClient(CustomView view) {
         this.view = view;
-        client = new Client("ws://192.168.0.111:7778/", "api", new Base64Coder() {
-            @NotNull
+        this.client = new Client("ws://neuralswarm.sshaddicts.ml/", "api",new Base64Coder() {
             @Override
-            public String encode(@NotNull byte[] bytes) {
+            public String encode(byte[] bytes) {
                 byte[] encode = Base64.encode(bytes, Base64.DEFAULT);
                 return new String(encode);
             }
 
-            @NotNull
             @Override
-            public byte[] decode(@NotNull String s) {
+            public byte[] decode(String s) {
                 return Base64.decode(s, Base64.DEFAULT);
             }
         });
     }
 
-    public NeuralSwarmClient(CustomView view){
-        this.view = view;
-        this.client = new Client("ws://192.168.0.111:7778/", "api", new Base64Coder() {
-            @NotNull
-            @Override
-            public String encode(@NotNull byte[] bytes) {
-                byte[] encode = Base64.encode(bytes, Base64.DEFAULT);
-                return new String(encode);
-            }
-
-            @NotNull
-            @Override
-            public byte[] decode(@NotNull String s) {
-                return Base64.decode(s, Base64.DEFAULT);
-            }
-        });
-    }
+    private Action1<Throwable> defaultExceptionHandler = new Action1<Throwable>() {
+        @Override
+        public void call(Throwable throwable) {throwable.printStackTrace();}
+    };
 
     public void registerClient() {
         client.getConnected().subscribe(new Action1<ConnectedClient>() {
@@ -83,19 +66,9 @@ public class NeuralSwarmClient {
                     public void call(AuthenticatedClient authenticatedClient) {
                         deferredClient.resolve(authenticatedClient);
                     }
-                }, new Action1<Throwable>() {
-                    @Override
-                    public void call(Throwable throwable) {
-                        throwable.printStackTrace();
-                    }
-                });
+                }, defaultExceptionHandler);
             }
-        }, new Action1<Throwable>() {
-            @Override
-            public void call(Throwable throwable) {
-                throwable.printStackTrace();
-            }
-        });
+        }, defaultExceptionHandler);
     }
 
     public void authenticateClient() {
@@ -107,19 +80,9 @@ public class NeuralSwarmClient {
                     public void call(AuthenticatedClient authenticatedClient) {
                         deferredClient.resolve(authenticatedClient);
                     }
-                }, new Action1<Throwable>() {
-                    @Override
-                    public void call(Throwable throwable) {
-                        throwable.printStackTrace();
-                    }
-                });
+                }, defaultExceptionHandler);
             }
-        }, new Action1<Throwable>() {
-            @Override
-            public void call(Throwable throwable) {
-                throwable.printStackTrace();
-            }
-        });
+        }, defaultExceptionHandler);
     }
 
     public void requestImageProcessing(final byte[] data, final int width, final int height) {
@@ -128,19 +91,14 @@ public class NeuralSwarmClient {
             @Override
             public void onDone(AuthenticatedClient result) {
                 result.processImage(data, width, height).subscribe(
-                        new Action1<ProcessedData>() {
+                            new Action1<ProcessedData>() {
                             @Override
                             public void call(ProcessedData processedData) {
                                 view.receiveData(processedData);
                                 System.out.println("imageProcessingFinished");
                             }
                         },
-                        new Action1<Throwable>() {
-                            @Override
-                            public void call(Throwable throwable) {
-                                throwable.printStackTrace();
-                            }
-                        }
+                        defaultExceptionHandler
                 );
             }
         });

@@ -8,4 +8,6 @@
     <string name="label_misstap_message">Oops, misstap, I actually do.</string>
     <string name="label_no_account_message">I do not have an account.</string>
     <string name="take_image_button">I want to take an image</string>
+    <string name="gallery_selection_button">Select from gallery</string>
+    <string name="pictures_folder">Android/data/com.github.sshaddicts.skeptikos/files/Pictures</string>
 </resources>
