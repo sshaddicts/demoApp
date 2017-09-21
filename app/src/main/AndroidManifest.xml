@@ -11,14 +11,8 @@
         android:allowBackup="true"
         android:icon="@drawable/logo"
         android:label="@string/app_name"
-        android:largeHeap="true"
-        android:supportsRtl="true"
         android:theme="@style/AppThemeDark.BrandedLaunch">
-        <activity android:name="android.support.multidex.MultiDexApplication">
-
-        </activity>
-
-        <activity android:name=".MainActivity">
+        <activity android:name=".GodActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

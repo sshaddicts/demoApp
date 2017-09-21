@@ -1,16 +1,16 @@
 apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
 
 android {
-    compileSdkVersion 21
-    buildToolsVersion '25.0.0'
+    compileSdkVersion 26
+    buildToolsVersion '26.0.1'
     defaultConfig {
         applicationId "com.github.sshaddicts.skeptikos"
         minSdkVersion 21
-        targetSdkVersion 21
+        targetSdkVersion 26
         versionCode 1
-        versionName '1.3'
+        versionName '1.45'
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-        versionNameSuffix '5'
         multiDexEnabled true
     }
     buildTypes {
@@ -23,10 +23,11 @@ android {
         sourceCompatibility 1.7
         targetCompatibility 1.7
     }
+
     packagingOptions {
-        pickFirst 'META-INF/INDEX.LIST'
-        pickFirst 'META-INF/LICENSE'
-        pickFirst 'META-INF/io.netty.versions.properties'
+        exclude 'META-INF/io.netty.versions.properties'
+        exclude 'META-INF/rxjava.properties'
+        println("hello")
     }
 }
 
@@ -34,11 +35,18 @@ dependencies {
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    compile 'org.slf4j:slf4j-api:1.7.25'
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+
     compile 'org.slf4j:slf4j-android:1.7.25'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
-    compile 'com.github.sshaddicts:neuralswarm.client:0.0.9'
-    compile 'org.jdeferred:jdeferred-android-aar:1.2.6'
-    compile 'com.android.support:support-v4:21.0.3'
-    compile 'com.android.support:appcompat-v7:21.0.3'
+
+    compile 'com.github.sshaddicts:neuralswarm.client:0.1.1'
+
+    testCompile 'junit:junit:4.12'
+    compile 'com.android.support:support-v4:26.1.0'
+    compile 'com.android.support:appcompat-v7:26.1.0'
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
+}
+repositories {
+    mavenCentral()
 }
