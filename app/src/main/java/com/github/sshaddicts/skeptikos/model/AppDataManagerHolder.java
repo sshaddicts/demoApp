@@ -1,13 +1,13 @@
 package com.github.sshaddicts.skeptikos.model;
 
-public class AppDataManagerHolder implements DataManager {
+public class AppDataManagerHolder {
 
-    public NeuralSwarmClient nsClient;
+    public CustomHttpClient nsClient;
 
     public static class AppDataManager {
         private static final AppDataManagerHolder INSTANCE = new AppDataManagerHolder();
 
-        public static void setNeuralSwarmClient(NeuralSwarmClient neuralSwarmClient) {
+        public static void setNeuralSwarmClient(CustomHttpClient neuralSwarmClient) {
             INSTANCE.setNeuralClient(neuralSwarmClient);
         }
 
@@ -15,14 +15,14 @@ public class AppDataManagerHolder implements DataManager {
             return INSTANCE;
         }
 
-        public static NeuralSwarmClient getClient(){
+        public static CustomHttpClient getClient(){
             return INSTANCE.nsClient;
         }
     }
 
     private AppDataManagerHolder(){}
 
-    private void setNeuralClient(NeuralSwarmClient client) {
+    private void setNeuralClient(CustomHttpClient client) {
         this.nsClient = client;
     }
 }

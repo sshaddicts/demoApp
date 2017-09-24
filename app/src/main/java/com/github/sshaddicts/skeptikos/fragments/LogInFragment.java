@@ -34,12 +34,12 @@ public class LogInFragment extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
 
-        info = (TextView) view.findViewById(R.id.loginInfoText);
-        account = (TextView) view.findViewById(R.id.loginRegister);
-        button = (Button) view.findViewById(R.id.loginConnectButton);
+        info = view.findViewById(R.id.loginInfoText);
+        account = view.findViewById(R.id.loginRegister);
+        button = view.findViewById(R.id.loginConnectButton);
 
-        final EditText usernameField = (EditText) view.findViewById(R.id.loginUsernameEdit);
-        final EditText passwordField = (EditText) view.findViewById(R.id.loginPasswordEdit);
+        final EditText usernameField = view.findViewById(R.id.loginUsernameEdit);
+        final EditText passwordField = view.findViewById(R.id.loginPasswordEdit);
 
         button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -66,20 +66,6 @@ public class LogInFragment extends Fragment {
                 isRegistrationRequested = !isRegistrationRequested;
             }
         });
-
-        view.setOnKeyListener(new View.OnKeyListener() {
-            @Override
-            public boolean onKey(View v, int keyCode, KeyEvent event) {
-                switch (keyCode){
-                    case KeyEvent.KEYCODE_BACK:{
-                        info.setText(R.string.welcoming_message);
-                        button.setText(R.string.connect_button_text);
-                        return true;
-                    }
-                    default: return false;
-                }
-            }
-        });
     }
 
     @Override
@@ -92,12 +78,6 @@ public class LogInFragment extends Fragment {
         try {
             AppDataManager.getClient().setUsername(username);
             AppDataManager.getClient().setPassword(password);
-
-            if (register) {
-                AppDataManager.getClient().registerClient();
-            } else {
-                AppDataManager.getClient().authenticateClient();
-            }
 
             if (mListener != null) {
                 mListener.onAuthenticated();
